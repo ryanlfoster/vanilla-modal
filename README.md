@@ -61,25 +61,17 @@ This part is important. *Vanilla Modal* doesn't use any fancy string interpolati
 </div>
 ```
 
-Next, add your modal content to a hidden container on the page.
+Next, add your modal content to hidden containers on the page. The modal will inline the contents **inside** the selected container.
 
 ```html
-<div style="display:none;">
-  <!--
-	Add your modal containers here.
-    Give each one an ID attribute.
-    It's totally possible to have
-    more than one modal per page,
-    and where they live in the DOM
-    doesn't matter. Just remember
-    that they will be hauled out
-    of whatever container they're
-    in whenever the modal opens.
-  -->
-  <div id="modal-1">Modal 1 content</div>
-  <div id="modal-2">Modal 2 content</div>
-  [...]
-</div>
+<!--
+  Give each one an ID attribute. It's totally possible to have
+  more than one modal per page, and where they live in the DOM
+  doesn't matter. Just remember that their innerHTML will be
+  hauled out of its container and inlined into the modal.
+-->
+<div id="modal-1" style="display:none;">Modal 1 content</div>
+<div id="modal-2" style="display:none;">Modal 2 content</div>
 ```
 
 ---
@@ -114,7 +106,7 @@ Here's an example (in Compass):
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba($businessblue, 0.6);
+    background: rgba(#000, 0.6);
     z-index: -1;
     opacity: 0;
     font-size: 0;
@@ -166,7 +158,7 @@ Here's an example (in Compass):
   max-height: 90%;
   overflow-x: hidden;
   overflow-y: auto;
-  background: $darkgrey;
+  background: #fff;
   z-index: -1;
   opacity: 0;
   transform: scale(0);
@@ -183,7 +175,7 @@ Here's an example (in Compass):
 ```
 
 ---
-#### 5. Put it all together using HTML and JavaScript directives
+#### 5. Directives and Methods
 
 Only two HTML directives affect the modal: the self-explanatory `rel="modal:open"` and `rel="modal:close`:
 
@@ -289,7 +281,7 @@ The class to apply to the `parent` container when the modal is open.
 
 #### `href` : `{string|node}`
 
-The initial content box for the modal. Use this when the modal has to be instantiated with an item already loaded up for viewing. This is analogous to the `href` argument in `modal.open(href)`.
+The content container's ID to load into the modal object on instantiation. Use this when the modal has to be instantiated with an item already loaded up for viewing. This is analogous to the `href` argument supplied to `modal.open(href)`. Always remember that the modal will inline the `innerHTML` of any ID specified.
 
 #### `clickOutside` : `{boolean}`
 

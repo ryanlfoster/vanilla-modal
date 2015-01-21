@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css.css">
+  </head>
+  <body>
+  
+    <a href="#modal-1" rel="modal:open">First Modal</a>
+    <a href="#modal-2" rel="modal:open">Second Modal</a>
+    
+    <div id="modal-1" style="display:none">
+      <img src="http://i.imgur.com/AzKAV.jpg" width="239" height="170" alt="Just Can't Reach.">
+    </div>
+    
+    <div id="modal-2" style="display:none">
+      <img src="http://www.gifbin.com/bin/032014/1395614704_cat_vs_steam.gif" width="396" height="275" alt="Almost Caught It.">
+    </div>
+    
+    <div class="modal">
+      <div class="modal-inner">
+        <a rel="modal:close">&times;</a>
+        <div class="modal-content"></div>
+      </div>
+    </div>
+    
+    <script src="../dist/vanilla-modal.js"></script>
+    <script>
+      var modal = new VanillaModal();
+      console.log(modal);
+    </script>
+  </body>
+</html>
