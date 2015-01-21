@@ -1,5 +1,7 @@
 # Vanilla Modal
 
+[![npm version](https://badge.fury.io/js/vanilla-modal.svg)](https://www.npmjs.com/package/vanilla-modal)
+
 ### A flexible, dependency-free, CSS-powered JavaScript modal.
 
 Or is it a JavaScript-powered CSS modal? No matter...
