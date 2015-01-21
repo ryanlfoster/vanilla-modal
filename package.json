@@ -2,7 +2,7 @@
   "name": "vanilla-modal",
   "version": "0.2.0",
   "description": "A dependency-free, pure JavaScript, CSS and HTML modal.",
-  "main": "vanilla-modal.js",
+  "main": "src/vanilla-modal.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/thephuse/vanilla-modal.git"

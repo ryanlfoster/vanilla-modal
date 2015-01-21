@@ -6,19 +6,12 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
 
-    uglify : {
-
-      options : {
-        mangle : true,
-        compress : true
-      },
-      
+    uglify : {      
       target : {
         files : {
           "dist/vanilla-modal.js" : ["src/vanilla-modal.js"]
         }
       }
-      
     }
     
   });
