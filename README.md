@@ -12,7 +12,7 @@ This is not the script you're looking for. It's licensed under the MIT License, 
 
 ### Why plain JavaScript?
 
-Because of the gzipped size of jQuery. Because of the performance of monolithic JavaScript frameworks. Because decoupled is the way to go. Because sometimes, a 10KB un-minified, un-gzipped file size is all you need.
+Because of the gzipped size of jQuery. Because of the performance of monolithic JavaScript frameworks. Because decoupled is the way to go. Because sometimes, a 5KB minified script is all you need.
 
 ### What about CSS Modal?
 
