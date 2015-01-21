@@ -259,61 +259,61 @@ The options object contains DOM selector strings and bindings. It can be overrid
 }
 ```
 
-### `modal` : `{string}`
+#### `modal` : `{string}`
 
 The class of the outer modal container. This is usually a fixed position element that takes up the whole screen. It doesn't have to be, though - the modal can just as easily be a discreet bar that pops out from the corner of the screen.
 
-### `modalInner` : `{string}`
+#### `modalInner` : `{string}`
 
 The inner container of the modal. This usually houses at least a close button (see HTML above). It should also contain the `modalContent` element.
 
-### `modalContent` : `{string}`
+#### `modalContent` : `{string}`
 
 The container used to house the modal's content when it's transferred to the modal. This should always be a child of `modalInner`.
 
-### `open` : `{string}`
+#### `open` : `{string}`
 
 The selector to bind the `open()` event to. This can be anything. I'd recommend using the default as it makes code legible.
 
-### `close` : `{string}`
+#### `close` : `{string}`
 
 As above, except replace `open()` with `close()`, turn around three times, and pat yourself on the head.
 
-### `parent` : `{string}`
+#### `parent` : `{string}`
 
 The outermost object to apply the `[data-gets-modal]` attribute and the `class` class to. This is `body` by default but could just as easily be `html` or `main` in any common web app.
 
-### `class` : `{string}`
+#### `class` : `{string}`
 
 The class to apply to the `parent` container when the modal is open.
 
-### `href` : `{string|node}`
+#### `href` : `{string|node}`
 
 The initial content box for the modal. Use this when the modal has to be instantiated with an item already loaded up for viewing. This is analogous to the `href` argument in `modal.open(href)`.
 
-### `clickOutside` : `{boolean}`
+#### `clickOutside` : `{boolean}`
 
 If set to `true`, a click outside the modal will fire a `close()` event. Otherwise, the only ways to close the modal are to hit `[esc]` or click an item covered by the `close` query selector (default: `[rel="modal:close"]`).
 
-### `transitions` : `{boolean}`
+#### `transitions` : `{boolean}`
 
 If set to `false`, the modal will treat every browser like IE 9 and ignore transitions when opening and closing.
 
-### `onBeforeOpen` : `{function}`
+#### `onBeforeOpen` : `{function}`
 
 A callback hook to fire before opening. This function is bound to the modal.
 
-### `onBeforeClose` : `{function}`
+#### `onBeforeClose` : `{function}`
 
 A callback hook to fire before closing. This function is bound to the modal.
 
-### `onOpen` : `{function}`
+#### `onOpen` : `{function}`
 
 A callback hook to fire on opening. This function is bound to the modal.
 
-### `onClose` : `{function}`
+#### `onClose` : `{function}`
 
-A callback hook to fire on closing. This function is bound to the modal. I just copied and pasted the last few lines.
+A callback hook to fire on closing. This function is bound to the modal. I just cheated & copy-pasted the last few lines.
 
 ---
 ## Compatibility
