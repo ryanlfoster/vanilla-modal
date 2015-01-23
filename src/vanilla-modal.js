@@ -339,7 +339,7 @@
   };
   
   if (typeof define === 'function' && define.amd) {
-    define('vanillaModal', function () {
+    define('VanillaModal', function () {
       return VanillaModal;
     });
   } else if (typeof module !== 'undefined' && module.exports) {
