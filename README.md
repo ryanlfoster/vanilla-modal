@@ -2,6 +2,10 @@
 
 [![npm version](https://badge.fury.io/js/vanilla-modal.svg)](https://www.npmjs.com/package/vanilla-modal)
 
+### [Check out the demo.](http://dev.thephuse.com/vanilla-modal/demo/)
+
+---
+
 ### A flexible, dependency-free, CSS-powered JavaScript modal.
 
 Or is it a JavaScript-powered CSS modal? No matter...
