@@ -1,12 +1,26 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <title>Vanilla Modal</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-  
-    <a href="#modal-1" rel="modal:open">First Modal</a>
-    <a href="#modal-2" rel="modal:open">Second Modal</a>
+    
+    <div class="modal-links">
+      <ul>
+        <li>
+          <a href="#modal-1" rel="modal:open">One Prodigious Cat</a>
+        </li>
+        <li>
+          <a href="#modal-2" rel="modal:open">One More Prodigious Cat</a>
+        </li>
+        <li>
+          <a href="#modal-3" rel="modal:open">Phuse Website</a>
+        </li>
+      </ul>
+    </div>
     
     <div id="modal-1" style="display:none">
       <img src="http://i.imgur.com/AzKAV.jpg" width="239" height="170" alt="Just Can't Reach.">
@@ -14,6 +28,10 @@
     
     <div id="modal-2" style="display:none">
       <img src="http://www.gifbin.com/bin/032014/1395614704_cat_vs_steam.gif" width="396" height="275" alt="Almost Caught It.">
+    </div>
+    
+    <div id="modal-3" style="display:none">
+      <iframe src="http://phuse.ca" width="360" height="576" frameborder="0"></iframe>
     </div>
     
     <div class="modal">
@@ -24,9 +42,6 @@
     </div>
     
     <script src="../dist/vanilla-modal.js"></script>
-    <script>
-      var modal = new VanillaModal();
-      console.log(modal);
-    </script>
+    <script>var modal = new VanillaModal();</script>
   </body>
 </html>
