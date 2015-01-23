@@ -1,6 +1,6 @@
 {
   "name": "vanilla-modal",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A dependency-free, pure JavaScript, CSS and HTML modal.",
   "main": "src/vanilla-modal.js",
   "repository": {
