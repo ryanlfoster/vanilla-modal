@@ -6,6 +6,10 @@
 
 Or is it a JavaScript-powered CSS modal? No matter...
 
+## License
+
+MIT. Please feel free to offer any input - pull requests, bug tracking, suggestions are all welcome.
+
 ## FAQ
 
 ### I'm looking for a jQuery modal I can copy & paste into my site.
@@ -20,25 +24,39 @@ Because of the bloat of DOM libraries. Because of the dreadful performance of mo
 
 ### What about CSS Modal?
 
-Great though [CSS Modal](http://drublic.github.io/css-modal/) (and similar solutions) are, the developer encounters problems when building a stateful UI, as using the CSS `:target` pseudo-attribute means changing the window's `location.hash` property. This can cause havoc with client-side routers, as well as obfuscate the modal on the offchance that any anchor inside it changes the window's hash.
+Great though [CSS Modal](http://drublic.github.io/css-modal/) (and similar solutions) are, developers may encounter problems when building a stateful UI, as using the CSS `:target` pseudo-class invariably means changing the window's `location.hash` property. This can cause havoc with client-side routers, as well as obfuscate the modal on the offchance that any anchor inside it changes the window's hash.
 
 ### Usage and Examples
 ---
 
 #### 1. Firstly, include the script in your project.
 
-* Browserify, Webpack and CommonJS aficionados in general get to use the following line:
-```javascript
-var VanillaModal = require('/path/to/vanilla-modal');`
-```
-* For RequireJS and other AMD loaders, use:
-```javascript
-require(['/path/to/vanilla-modal'], function(VanillaModal) { ... });
-```
-* Or, if you can't bear to be fancy:
-```html
-<script src="/path/to/vanilla-modal.js"></script>
-```
+* The script can be installed from NPM and included using Browserify:
+
+	**Command line**:
+	```sh
+	npm install --save-dev vanilla-modal
+	```
+	
+	**JavaScript**:
+	```javascript
+	var VanillaModal = require('vanilla-modal');
+	```
+
+* Browserify (without NPM), Webpack and CommonJS aficionados get to use the following line:
+	```javascript
+	var VanillaModal = require('/path/to/vanilla-modal');`
+	```
+
+* For RequireJS, Webpack AMD and similar asynchronous module loaders, use:
+	```javascript
+	require(['/path/to/vanilla-modal'], function(VanillaModal) { ... });
+	```
+
+* Or, if you just can't bear to be fancy:
+	```html
+	<script src="/path/to/vanilla-modal.js"></script>
+	```
 
 ---
 #### 2. Next, instantiate your modal.
