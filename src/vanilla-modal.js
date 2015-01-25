@@ -1,343 +1,284 @@
 /**
- * @name Vanilla Modal
- * @description A vanilla JavaScript modal module
- * @version 1.0.0
+ * @class VanillaModal
+ * @version 0.3.0
  * @author Ben Ceglowski
  */
-(function(window, document, undefined) {
-  'use strict';
+class VanillaModal {
   
-  var self;
-  
-  var VanillaModal = (function(userOptions) {
+  /**
+   * @param {Object} [userSettings]
+   */
+  constructor(userSettings) {
     
-    self = this;
-    
-    self.userOptions = userOptions || {};
-    
-    // Bootstrap settings
-    self.settings = {
-      'modal' : '.modal',
-      'modalInner' : '.modal-inner',
-      'modalContent' : '.modal-content',
-      'open' : '[rel="modal:open"]',
-      'close' : '[rel="modal:close"]',
-      'parent' : 'body',
-      'class' : 'modal-visible',
-      'href' : false,
-      'clickOutside' : false,
-      'transitions' : true,
-      'onBeforeOpen' : function() {},
-      'onBeforeClose' : function() {},
-      'onOpen' : function() {},
-      'onClose' : function() {}
+    this.$$ = {
+      modal : '.modal',
+      modalInner : '.modal-inner',
+      modalContent : '.modal-content',
+      open : '[rel="modal:open"]',
+      close : '[rel="modal:close"]',
+      page : 'body',
+      class : 'modal-visible',
+      loadClass : 'vanilla-modal',
+      href : false,
+      clickOutside : true,
+      escapeKey : true,
+      transitions : true,
+      onBeforeOpen : function() {},
+      onBeforeClose : function() {},
+      onOpen : function() {},
+      onClose : function() {}
     };
     
-    self.DOM = {};
-    self.isOpen = false;
-    self.transitionEnd = null;
+    this.isOpen = false;
     
-    // Handle exceptions gently if no modal found
-    try {
-      self.sniffTransitionEnd();
-      self.bootstrap();
-      self.prepareDOM();
-      self.addParentAttr();
-      self.attachEvents();
-    } catch(e) {}
+    this.open = this._open.bind(this);
+    this.close = this._close.bind(this);
+    this.escapeKeyHandler = this._escapeKeyHandler.bind(this);
+    this.outsideClickHandler = this._outsideClickHandler.bind(this);
     
-    return this;
+    this.userSettings = this.applyUserSettings(userSettings); 
+    this.transitionEnd = this.transitionEndVendorSniff();
+    this.$ = this._setupDomNodes();
     
-  });
+    this._addLoadedCssClass();
+    this._addEvents();
+  }
   
-  VanillaModal.prototype = {
-    
-    // Checks for the browser variant of transitionend
-    sniffTransitionEnd : function() {
-      
-      var el = document.createElement('div');
-      
-      var transitions = {
-        'transition':'transitionend',
-        'OTransition':'otransitionend',
-        'MozTransition':'transitionend',
-        'WebkitTransition':'webkitTransitionEnd'
-      };
-
-      for (var i in transitions) {
-        if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
-          return self.transitionEnd = transitions[i];
-        }
+  applyUserSettings() {
+    if (typeof this.userSettings === 'object') {
+      for (var i in this.userSettings) {
+        this.$$[i] = this.userSettings[i];
       }
-    
-    },
-    
-    // Adds user settings to the mix
-    bootstrap : function() {
-      
-      if (typeof self.userOptions === 'object') {
-        for (var i in self.userOptions) {
-          self.settings[i] = self.userOptions[i];
-        }
-      }
-      
-    },
-    
-    // Builds the DOM selector object
-    prepareDOM : function() {
-      
-      self.DOM.modal         = document.querySelector(self.settings.modal);
-      self.DOM.modalInner    = self.DOM.modal.querySelector(self.settings.modalInner);
-      self.DOM.modalContent  = self.DOM.modal.querySelector(self.settings.modalContent);
-      self.DOM.open          = document.querySelectorAll(self.settings.open);
-      self.DOM.close         = document.querySelectorAll(self.settings.close);
-      self.DOM.parent        = document.querySelector(self.settings.parent);
-      
-    },
-    
-    // Preps the page to accept a modal
-    addParentAttr : function() {
-      
-      self.DOM.parent.setAttribute('data-gets-modal', '');
-      
-    },
-    
-    addClass : function(el, className) {
-      
-      if (! el instanceof HTMLElement) return;
-      
-      var cssClasses = el.className.split(' ');
-      
-      if (cssClasses.indexOf(className) === -1) {
-        cssClasses.push(className);
-      }
-      
-      el.className = cssClasses.join(' ');
-      
-    },
-    
-    removeClass : function(el, className) {
-      
-      if (! el instanceof HTMLElement) return;
-      
-      var cssClasses = el.className.split(' ');
-      
-      if (cssClasses.indexOf(className) > -1) {
-        cssClasses.splice(cssClasses.indexOf(className), 1);
-      }
-      
-      el.className = cssClasses.join(' ');
-      
-    },
-    
-    // Opens the modal
-    open : function (e) {
-      
-      // Using modal.open(e)
-      if(typeof e === 'string') {
-        
-        self.settings.href = document.querySelector(e);
-      
-      // On click
-      } else if(e instanceof MouseEvent && typeof this.hash === 'string') {
-        
-        self.settings.href = document.querySelector(this.hash);
-        e.preventDefault();
-      
-      // Using new VanillaModal({ href : '#something' }).open()
-      } else if(typeof self.settings.href !== 'undefined') {
-        
-        // If a string is passed, try to find the corresponding element
-        if(typeof self.settings.href === 'string') {
-          self.settings.href = document.querySelector(self.settings.href);
-        }
-        
-        // Regardless, check whether the element exists
-        if( ! self.settings.href || ! self.settings.href.length || ! self.settings.href instanceof HTMLElement) {
-          return; 
-        }
-      
-      // Otherwise don't open the modal
-      } else {
-        
-        return;
-        
-      }
-      
-      // Fires callback prior to opening
-      if(typeof self.settings.onBeforeOpen === 'function') self.settings.onBeforeOpen.bind(self);
-      
-      // Pulls the DOM node out of the DOM
-      self.acquireDOMNode();
-      
-      // Adds the relevant class to the modal's parent container
-      self.addClass(self.DOM.parent, self.settings.class);
-      
-      var id = (self.settings.href.id ? self.settings.href.id : 'anonymous');
-      
-      self.DOM.parent.setAttribute('data-current-modal', id);
-      
-      // Flags the modal as being open
-      self.isOpen = true;
-      
-      // Fires callback after opening
-      if(typeof self.settings.onOpen === 'function') self.settings.onOpen.bind(self);
-      
-      // Make object chainable
-      return self;
-      
-    },
-    
-    close : function (e) {
-      
-      // Disable default action if closed on click
-      if(e) e.preventDefault();
-      
-      // Fires callback prior to closing
-      if(typeof self.settings.onBeforeClose === 'function') self.settings.onBeforeClose.bind(self);
-      
-      // Removes class from parent element
-      self.removeClass(self.DOM.parent, self.settings.class);
-      
-      // Determines whether to close instantly or transition closed
-      if(self.transitionEnd && self.settings.transitions !== false) {
-        self.closeWithTransition();
-      } else {
-        self.closeWithoutTransition();
-      }
-      
-      // Makes object chainable
-      return self;
-      
-    },
-    
-    // Handles removal of event listeners and resets on close
-    transitionHandler : function() {
-      
-      self.DOM.modal.removeEventListener(self.transitionEnd, self.transitionHandler, false);
-      
-      self.DOM.parent.removeAttribute('data-current-modal');
-      self.returnDOMNode();
-      self.isOpen = false;
-      
-      if(typeof self.settings.onClose === 'function') self.settings.onClose.bind(self);
-      
-    },
-    
-    // Invokes closing with transition
-    closeWithTransition : function() {
-      
-      self.DOM.modal.addEventListener(self.transitionEnd, self.transitionHandler, false);
-      
-    },
-    
-    // Closes the modal unflatteringly
-    closeWithoutTransition : function() {
-      
-      self.DOM.parent.removeAttribute('data-current-modal');
-      self.returnDOMNode();
-      self.isOpen = false;
-      
-      if(typeof self.settings.onClose === 'function') self.settings.onClose.bind(self);
-        
-    },
-    
-    // Transplants target DOM node into modal
-    acquireDOMNode : function() {
-      
-      if(!self.settings.href) return;
-      
-      while(self.settings.href.childNodes.length > 0) {
-        self.DOM.modalContent.appendChild(self.settings.href.childNodes[0]);
-      }
-      
-    },
-    
-    // Returns target DOM node to its regular position
-    returnDOMNode : function() {
-      
-      if(!self.settings.href) return;
-      
-      while(self.DOM.modalContent.childNodes.length > 0) {
-        self.settings.href.appendChild(self.DOM.modalContent.childNodes[0]);
-      }
-      
-    },
-    
-    // Does what it says on the tin, closes the modal
-    detectEscapeKey : function(e) {
-      
-      if(e.keyCode === 27 && self.isOpen === true) {
-        e.preventDefault();
-        self.close();
-      }
-      
-    },
-    
-    // Detects clicks outside the modal, closes the modal
-    modalClickHandler : function(e) {
-      
-      var node = e.target;
-      
-      while(node != document.body) {
-        if (node === self.DOM.modalInner) return;
-        node = node.parentNode;
-      }
-      
-      self.close();
-      
-    },
-    
-    // Adds listeners for all the open & close events
-    attachEvents : function() {
-      
-      for (var i = 0; i < self.DOM.open.length; i++) {
-        (function (_i) {
-          self.DOM.open[_i].addEventListener('click', self.open, false);
-        })(i);
-      }
-      
-      for (var i = 0; i < self.DOM.close.length; i++) {
-        (function (_i) {
-          self.DOM.close[_i].addEventListener('click', self.close, false);
-        })(i);
-      }
-      
-      if(self.settings.clickOutside === true) {
-        self.DOM.modal.addEventListener('click', self.modalClickHandler, false);
-      }
-      
-      document.addEventListener('keydown', self.detectEscapeKey, false);
-      
-    },
-    
-    // Wipes out the modal without a trace
-    destroy : function() {
-      
-      self.close();
-      
-      for (var i = 0; i < self.DOM.open.length; i++) {
-        (function (_i) {
-          self.DOM.open[_i].removeEventListener('click', self.open);
-        })(i);
-      }
-      
-      for (var i = 0; i < self.DOM.close.length; i++) {
-        (function (_i) {
-          self.DOM.close[_i].addEventListener('click', self.close);
-        })(i);
-      }
-      
-      if(self.settings.clickOutside === true) {
-        self.DOM.modal.removeEventListener('click', self.modalClickHandler);
-      }
-      
-      document.removeEventListener('keydown', self.detectEscapeKey);
-      
     }
-     
-  };
+  }
   
+  transitionEndVendorSniff() {
+    if (this.$$.transitions) return;
+    var el = document.createElement('div');
+    var transitions = {
+      'transition':'transitionend',
+      'OTransition':'otransitionend',
+      'MozTransition':'transitionend',
+      'WebkitTransition':'webkitTransitionEnd'
+    };
+    for (var i in transitions) {
+      if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
+        return this.transitionEnd = transitions[i];
+      }
+    }
+  }
+  
+  /**
+   * @param {String} selector
+   * @param {Node} parent
+   */
+  getNode(selector, parent) {
+    var parent = parent || document;
+    var node = parent.querySelector(selector);
+    if (!node) return console.error('Element "' + selector + '" does not exist in context.');
+    return node;
+  }
+  
+  /**
+   * @param {String} selector
+   * @param {Node} parent
+   */
+  _getNodeList(selector, parent) {
+    var parent = parent || document;
+    var nodes = parent.querySelectorAll(selector);
+    if (!nodes.length) return console.error('Element "' + selector + '" does not exist in context.');
+    return nodes;
+  }
+  
+  _setupDomNodes() {
+    var $ = {};
+    $.modal = this.getNode(this.$$.modal);
+    $.page = this.getNode(this.$$.page);
+    $.modalInner = this.getNode(this.$$.modalInner, this.modal);
+    $.modalContent = this.getNode(this.$$.modalContent, this.modal);
+    $.open = this._getNodeList(this.$$.open);
+    $.close = this._getNodeList(this.$$.close);
+    return $;
+  }
+  
+  _addLoadedCssClass() {
+    this._addClass(this.$.page, this.$$.loadClass);
+  }
+  
+  /**
+   * @param {Node} el
+   * @param {String} className
+   */
+  _addClass(el, className) {
+    if (! el instanceof HTMLElement) return;
+    var cssClasses = el.className.split(' ');
+    if (cssClasses.indexOf(className) === -1) {
+      cssClasses.push(className);
+    }
+    el.className = cssClasses.join(' ');
+  }
+  
+  /**
+   * @param {Node} el
+   * @param {String} className
+   */
+  _removeClass(el, className) {
+    if (! el instanceof HTMLElement) return;
+    var cssClasses = el.className.split(' ');
+    if (cssClasses.indexOf(className) > -1) {
+      cssClasses.splice(cssClasses.indexOf(className), 1);
+    }
+    el.className = cssClasses.join(' ');
+  }
+  
+  _setOpenId() {
+    var id = this.$$.href.id || 'anonymous';
+    this.$.page.setAttribute('data-current-modal', id);
+  }
+  
+  _removeOpenId() {
+    this.$.page.removeAttribute('data-current-modal');
+  }
+  
+  _getElementContext(e) {
+    if (e.currentTarget && typeof e.currentTarget.hash === 'string') {
+      return document.querySelector(e.currentTarget.hash);
+    } else if (typeof e === 'string') {
+      return document.querySelector(e);
+    }
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _open(e) {
+    this.$$.href = this._getElementContext(e);
+    if (this.$$.href instanceof HTMLElement === false) return console.error('Element "' + this.$$.href + '" does not exist in context.');
+    if (typeof this.$$.onBeforeOpen === 'function') this.$$.onBeforeOpen.bind(this);
+    this.captureNode();
+    this._addClass(this.$.page, this.$$.class);
+    this._setOpenId();
+    this.isOpen = true;
+    if (typeof this.$$.onOpen === 'function') this.$$.onOpen.bind(this);
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _close(e) {
+    if (typeof this.$$.onBeforeClose === 'function') this.$$.onBeforeClose.bind(this);
+    this._removeClass(this.$.page, this.$$.class);
+    if (this.$$.transitions && this.transitionEnd) {
+      this._closeModalWithTransition();
+    } else {
+      this._closeModal();
+    }
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+  }
+  
+  _closeModal() {
+    this._removeOpenId(this.$.page);
+    this.releaseNode();
+    this.isOpen = false;
+    if (typeof this.$$.onClose === 'function') this.$$.onClose.bind(this);
+  }
+  
+  _closeTransitionHandler() {
+    this.$.modal.removeEventListener(this.transitionEnd, this._closeTransitionHandler);
+    this._closeModal();
+  }
+  
+  _closeModalWithTransition() {
+    this.$.modal.addEventListener(this.transitionEnd, this._closeTransitionHandler);
+  }
+  
+  /**
+   * @param {Node} node
+   */
+  captureNode(node) {
+    try {
+      while(this.$$.href.childNodes.length > 0) {
+        this.$.modalContent.appendChild(this.$$.href.childNodes[0]);
+      }
+    } catch(e) {
+      return console.error('The target modal has no child elements.');
+    }
+  }
+  
+  releaseNode() {
+    try {
+      while(this.$.modalContent.childNodes.length > 0) {
+        this.$$.href.appendChild(this.$.modalContent.childNodes[0]);
+      }
+    } catch(e) {
+      return console.error('The modal\'s original container no longer exists.');
+    }
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _escapeKeyHandler(e) {
+    if (e.keyCode === 27 && this.isOpen === true) {
+      e.preventDefault();
+      this.close();
+    }
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _outsideClickHandler(e) {
+    var node = e.target;
+    while(node != document.body) {
+      if (node === this.$.modalInner) return;
+      node = node.parentNode;
+    }
+    this.close();
+  }
+  
+  /**
+   * @param {NodeList} nodes
+   * @param {String} event
+   * @param {Function} fn
+   */
+  _addEvent(nodes, event, fn) {
+    if (! nodes.length) nodes = [nodes];
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].addEventListener(event, fn);
+    }
+  }
+  
+  /**
+   * @param {NodeList} nodes
+   * @param {String} event
+   * @param {Function} fn
+   */
+  _removeEvent(nodes, event, fn) {
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].removeEventListener(event, fn);
+    }
+  }
+  
+  _addEvents() {
+    this._addEvent(this.$.open, 'click', this.open);
+    this._addEvent(this.$.close, 'click', this.close);
+    if (this.$$.escapeKey === true) this._addEvent(document, 'keydown', this.escapeKeyHandler);
+    if (this.$$.clickOutside === true) this._addEvent(this.$.modal, 'click', this.outsideClickHandler);
+  }
+  
+  destroy() {
+    this.close();
+    this._removeEvent(this.$.open, 'click', this.open);
+    this._removeEvent(this.$.close, 'click', this.close);
+    if (this.$$.escapeKey === true) this._removeEvent(document, 'keydown', this.escapeKeyHandler);
+    if (this.$$.clickOutside === true) this._removeEvent(this.$.modal, 'click', this.outsideClickHandler);
+  }
+   
+}
+
+(function() {
   if (typeof define === 'function' && define.amd) {
     define('VanillaModal', function () {
       return VanillaModal;
@@ -347,5 +288,4 @@
   } else {
     window.VanillaModal = VanillaModal;
   }
-  
-})(window, document);
+})();

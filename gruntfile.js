@@ -2,7 +2,9 @@ module.exports = function(grunt) {
 
   "use strict";
 
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-6to5');
 
   grunt.initConfig({
     
@@ -15,13 +17,36 @@ module.exports = function(grunt) {
           report : 'gzip'
         },
         files : {
-          "dist/vanilla-modal.js" : ["src/vanilla-modal.js"]
+          "dist/vanilla-modal.min.js" : ["dist/vanilla-modal.js"]
+        }
+      }
+    },
+    
+    '6to5' : {
+      options : {
+        sourceMap: true
+      },
+      dist : {
+        files : {
+          "dist/vanilla-modal.js" : "src/vanilla-modal.js"
+        }
+      }
+    },
+    
+    watch : {
+      scripts: {
+        files: ["src/vanilla-modal.js"],
+        tasks: ["build"],
+        options: {
+          spawn: false,
         }
       }
     }
     
   });
     
+  grunt.registerTask("default", ["6to5", "uglify", "watch"]);
+  grunt.registerTask("build", ["6to5", "uglify"]);
   grunt.registerTask("minify", ["uglify"]);
 
 };

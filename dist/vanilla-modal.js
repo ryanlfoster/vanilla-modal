@@ -1,8 +1,407 @@
+"use strict";
+
+var _prototypeProperties = function (child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);
+  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
 /**
- * @name vanilla-modal
- * @version 0.2.0
+ * @class VanillaModal
+ * @version 0.3.0
  * @author Ben Ceglowski
- * @url http://phuse.ca
- * @date 2015-01-23
- * @license MIT
- */;!function(a,b,c){"use strict";var d,e=function(a){d=this,d.userOptions=a||{},d.settings={modal:".modal",modalInner:".modal-inner",modalContent:".modal-content",open:'[rel="modal:open"]',close:'[rel="modal:close"]',parent:"body","class":"modal-visible",href:!1,clickOutside:!1,transitions:!0,onBeforeOpen:function(){},onBeforeClose:function(){},onOpen:function(){},onClose:function(){}},d.DOM={},d.isOpen=!1,d.transitionEnd=null;try{d.sniffTransitionEnd(),d.bootstrap(),d.prepareDOM(),d.addParentAttr(),d.attachEvents()}catch(b){}return this};e.prototype={sniffTransitionEnd:function(){var a=b.createElement("div"),e={transition:"transitionend",OTransition:"otransitionend",MozTransition:"transitionend",WebkitTransition:"webkitTransitionEnd"};for(var f in e)if(e.hasOwnProperty(f)&&a.style[f]!==c)return d.transitionEnd=e[f]},bootstrap:function(){if("object"==typeof d.userOptions)for(var a in d.userOptions)d.settings[a]=d.userOptions[a]},prepareDOM:function(){d.DOM.modal=b.querySelector(d.settings.modal),d.DOM.modalInner=d.DOM.modal.querySelector(d.settings.modalInner),d.DOM.modalContent=d.DOM.modal.querySelector(d.settings.modalContent),d.DOM.open=b.querySelectorAll(d.settings.open),d.DOM.close=b.querySelectorAll(d.settings.close),d.DOM.parent=b.querySelector(d.settings.parent)},addParentAttr:function(){d.DOM.parent.setAttribute("data-gets-modal","")},addClass:function(a,b){if(!(!a instanceof HTMLElement)){var c=a.className.split(" ");-1===c.indexOf(b)&&c.push(b),a.className=c.join(" ")}},removeClass:function(a,b){if(!(!a instanceof HTMLElement)){var c=a.className.split(" ");c.indexOf(b)>-1&&c.splice(c.indexOf(b),1),a.className=c.join(" ")}},open:function(a){if("string"==typeof a)d.settings.href=b.querySelector(a);else if(a instanceof MouseEvent&&"string"==typeof this.hash)d.settings.href=b.querySelector(this.hash),a.preventDefault();else{if("undefined"==typeof d.settings.href)return;if("string"==typeof d.settings.href&&(d.settings.href=b.querySelector(d.settings.href)),!d.settings.href||!d.settings.href.length||!d.settings.href instanceof HTMLElement)return}"function"==typeof d.settings.onBeforeOpen&&d.settings.onBeforeOpen.bind(d),d.acquireDOMNode(),d.addClass(d.DOM.parent,d.settings["class"]);var c=d.settings.href.id?d.settings.href.id:"anonymous";return d.DOM.parent.setAttribute("data-current-modal",c),d.isOpen=!0,"function"==typeof d.settings.onOpen&&d.settings.onOpen.bind(d),d},close:function(a){return a&&a.preventDefault(),"function"==typeof d.settings.onBeforeClose&&d.settings.onBeforeClose.bind(d),d.removeClass(d.DOM.parent,d.settings["class"]),d.transitionEnd&&d.settings.transitions!==!1?d.closeWithTransition():d.closeWithoutTransition(),d},transitionHandler:function(){d.DOM.modal.removeEventListener(d.transitionEnd,d.transitionHandler,!1),d.DOM.parent.removeAttribute("data-current-modal"),d.returnDOMNode(),d.isOpen=!1,"function"==typeof d.settings.onClose&&d.settings.onClose.bind(d)},closeWithTransition:function(){d.DOM.modal.addEventListener(d.transitionEnd,d.transitionHandler,!1)},closeWithoutTransition:function(){d.DOM.parent.removeAttribute("data-current-modal"),d.returnDOMNode(),d.isOpen=!1,"function"==typeof d.settings.onClose&&d.settings.onClose.bind(d)},acquireDOMNode:function(){if(d.settings.href)for(;d.settings.href.childNodes.length>0;)d.DOM.modalContent.appendChild(d.settings.href.childNodes[0])},returnDOMNode:function(){if(d.settings.href)for(;d.DOM.modalContent.childNodes.length>0;)d.settings.href.appendChild(d.DOM.modalContent.childNodes[0])},detectEscapeKey:function(a){27===a.keyCode&&d.isOpen===!0&&(a.preventDefault(),d.close())},modalClickHandler:function(a){for(var c=a.target;c!=b.body;){if(c===d.DOM.modalInner)return;c=c.parentNode}d.close()},attachEvents:function(){for(var a=0;a<d.DOM.open.length;a++)!function(a){d.DOM.open[a].addEventListener("click",d.open,!1)}(a);for(var a=0;a<d.DOM.close.length;a++)!function(a){d.DOM.close[a].addEventListener("click",d.close,!1)}(a);d.settings.clickOutside===!0&&d.DOM.modal.addEventListener("click",d.modalClickHandler,!1),b.addEventListener("keydown",d.detectEscapeKey,!1)},destroy:function(){d.close();for(var a=0;a<d.DOM.open.length;a++)!function(a){d.DOM.open[a].removeEventListener("click",d.open)}(a);for(var a=0;a<d.DOM.close.length;a++)!function(a){d.DOM.close[a].addEventListener("click",d.close)}(a);d.settings.clickOutside===!0&&d.DOM.modal.removeEventListener("click",d.modalClickHandler),b.removeEventListener("keydown",d.detectEscapeKey)}},"function"==typeof define&&define.amd?define("VanillaModal",function(){return e}):"undefined"!=typeof module&&module.exports?module.exports=e:a.VanillaModal=e}(window,document);
+ */
+var VanillaModal = (function () {
+  /**
+   * @param {Object} [userSettings]
+   */
+  function VanillaModal(userSettings) {
+    this.$$ = {
+      modal: ".modal",
+      modalInner: ".modal-inner",
+      modalContent: ".modal-content",
+      open: "[rel=\"modal:open\"]",
+      close: "[rel=\"modal:close\"]",
+      page: "body",
+      "class": "modal-visible",
+      loadClass: "vanilla-modal",
+      href: false,
+      clickOutside: true,
+      escapeKey: true,
+      transitions: true,
+      onBeforeOpen: function () {},
+      onBeforeClose: function () {},
+      onOpen: function () {},
+      onClose: function () {}
+    };
+
+    this.isOpen = false;
+
+    this.open = this._open.bind(this);
+    this.close = this._close.bind(this);
+    this.escapeKeyHandler = this._escapeKeyHandler.bind(this);
+    this.outsideClickHandler = this._outsideClickHandler.bind(this);
+
+    this.userSettings = this.applyUserSettings(userSettings);
+    this.transitionEnd = this.transitionEndVendorSniff();
+    this.$ = this._setupDomNodes();
+
+    this._addLoadedCssClass();
+    this._addEvents();
+  }
+
+  _prototypeProperties(VanillaModal, null, {
+    applyUserSettings: {
+      value: function applyUserSettings() {
+        if (typeof this.userSettings === "object") {
+          for (var i in this.userSettings) {
+            this.$$[i] = this.userSettings[i];
+          }
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    transitionEndVendorSniff: {
+      value: function transitionEndVendorSniff() {
+        if (this.$$.transitions) return;
+        var el = document.createElement("div");
+        var transitions = {
+          transition: "transitionend",
+          OTransition: "otransitionend",
+          MozTransition: "transitionend",
+          WebkitTransition: "webkitTransitionEnd"
+        };
+        for (var i in transitions) {
+          if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
+            return this.transitionEnd = transitions[i];
+          }
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    getNode: {
+
+      /**
+       * @param {String} selector
+       * @param {Node} parent
+       */
+      value: function getNode(selector, parent) {
+        var parent = parent || document;
+        var node = parent.querySelector(selector);
+        if (!node) return console.error("Element \"" + selector + "\" does not exist in context.");
+        return node;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _getNodeList: {
+
+      /**
+       * @param {String} selector
+       * @param {Node} parent
+       */
+      value: function GetNodeList(selector, parent) {
+        var parent = parent || document;
+        var nodes = parent.querySelectorAll(selector);
+        if (!nodes.length) return console.error("Element \"" + selector + "\" does not exist in context.");
+        return nodes;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _setupDomNodes: {
+      value: function SetupDomNodes() {
+        var $ = {};
+        $.modal = this.getNode(this.$$.modal);
+        $.page = this.getNode(this.$$.page);
+        $.modalInner = this.getNode(this.$$.modalInner, this.modal);
+        $.modalContent = this.getNode(this.$$.modalContent, this.modal);
+        $.open = this._getNodeList(this.$$.open);
+        $.close = this._getNodeList(this.$$.close);
+        return $;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _addLoadedCssClass: {
+      value: function AddLoadedCssClass() {
+        this._addClass(this.$.page, this.$$.loadClass);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _addClass: {
+
+      /**
+       * @param {Node} el
+       * @param {String} className
+       */
+      value: function AddClass(el, className) {
+        if (!el instanceof HTMLElement) return;
+        var cssClasses = el.className.split(" ");
+        if (cssClasses.indexOf(className) === -1) {
+          cssClasses.push(className);
+        }
+        el.className = cssClasses.join(" ");
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _removeClass: {
+
+      /**
+       * @param {Node} el
+       * @param {String} className
+       */
+      value: function RemoveClass(el, className) {
+        if (!el instanceof HTMLElement) return;
+        var cssClasses = el.className.split(" ");
+        if (cssClasses.indexOf(className) > -1) {
+          cssClasses.splice(cssClasses.indexOf(className), 1);
+        }
+        el.className = cssClasses.join(" ");
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _setOpenId: {
+      value: function SetOpenId() {
+        var id = this.$$.href.id || "anonymous";
+        this.$.page.setAttribute("data-current-modal", id);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _removeOpenId: {
+      value: function RemoveOpenId() {
+        this.$.page.removeAttribute("data-current-modal");
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _getElementContext: {
+      value: function GetElementContext(e) {
+        if (e.currentTarget && typeof e.currentTarget.hash === "string") {
+          return document.querySelector(e.currentTarget.hash);
+        } else if (typeof e === "string") {
+          return document.querySelector(e);
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _open: {
+
+      /**
+       * @param {Event} e
+       */
+      value: function Open(e) {
+        this.$$.href = this._getElementContext(e);
+        if (this.$$.href instanceof HTMLElement === false) return console.error("Element \"" + this.$$.href + "\" does not exist in context.");
+        if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.bind(this);
+        this.captureNode();
+        this._addClass(this.$.page, this.$$["class"]);
+        this._setOpenId();
+        this.isOpen = true;
+        if (typeof this.$$.onOpen === "function") this.$$.onOpen.bind(this);
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _close: {
+
+      /**
+       * @param {Event} e
+       */
+      value: function Close(e) {
+        if (typeof this.$$.onBeforeClose === "function") this.$$.onBeforeClose.bind(this);
+        this._removeClass(this.$.page, this.$$["class"]);
+        if (this.$$.transitions && this.transitionEnd) {
+          this._closeModalWithTransition();
+        } else {
+          this._closeModal();
+        }
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _closeModal: {
+      value: function CloseModal() {
+        this._removeOpenId(this.$.page);
+        this.releaseNode();
+        this.isOpen = false;
+        if (typeof this.$$.onClose === "function") this.$$.onClose.bind(this);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _closeTransitionHandler: {
+      value: function CloseTransitionHandler() {
+        this.$.modal.removeEventListener(this.transitionEnd, this._closeTransitionHandler);
+        this._closeModal();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _closeModalWithTransition: {
+      value: function CloseModalWithTransition() {
+        this.$.modal.addEventListener(this.transitionEnd, this._closeTransitionHandler);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    captureNode: {
+
+      /**
+       * @param {Node} node
+       */
+      value: function captureNode(node) {
+        try {
+          while (this.$$.href.childNodes.length > 0) {
+            this.$.modalContent.appendChild(this.$$.href.childNodes[0]);
+          }
+        } catch (e) {
+          return console.error("The target modal has no child elements.");
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    releaseNode: {
+      value: function releaseNode() {
+        try {
+          while (this.$.modalContent.childNodes.length > 0) {
+            this.$$.href.appendChild(this.$.modalContent.childNodes[0]);
+          }
+        } catch (e) {
+          return console.error("The modal's original container no longer exists.");
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _escapeKeyHandler: {
+
+      /**
+       * @param {Event} e
+       */
+      value: function EscapeKeyHandler(e) {
+        if (e.keyCode === 27 && this.isOpen === true) {
+          e.preventDefault();
+          this.close();
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _outsideClickHandler: {
+
+      /**
+       * @param {Event} e
+       */
+      value: function OutsideClickHandler(e) {
+        var node = e.target;
+        while (node != document.body) {
+          if (node === this.$.modalInner) return;
+          node = node.parentNode;
+        }
+        this.close();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _addEvent: {
+
+      /**
+       * @param {NodeList} nodes
+       * @param {String} event
+       * @param {Function} fn
+       */
+      value: function AddEvent(nodes, event, fn) {
+        if (!nodes.length) nodes = [nodes];
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].addEventListener(event, fn);
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _removeEvent: {
+
+      /**
+       * @param {NodeList} nodes
+       * @param {String} event
+       * @param {Function} fn
+       */
+      value: function RemoveEvent(nodes, event, fn) {
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].removeEventListener(event, fn);
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _addEvents: {
+      value: function AddEvents() {
+        this._addEvent(this.$.open, "click", this.open);
+        this._addEvent(this.$.close, "click", this.close);
+        if (this.$$.escapeKey === true) this._addEvent(document, "keydown", this.escapeKeyHandler);
+        if (this.$$.clickOutside === true) this._addEvent(this.$.modal, "click", this.outsideClickHandler);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    destroy: {
+      value: function destroy() {
+        this.close();
+        this._removeEvent(this.$.open, "click", this.open);
+        this._removeEvent(this.$.close, "click", this.close);
+        if (this.$$.escapeKey === true) this._removeEvent(document, "keydown", this.escapeKeyHandler);
+        if (this.$$.clickOutside === true) this._removeEvent(this.$.modal, "click", this.outsideClickHandler);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    }
+  });
+
+  return VanillaModal;
+})();
+
+(function () {
+  if (typeof define === "function" && define.amd) {
+    define("VanillaModal", function () {
+      return VanillaModal;
+    });
+  } else if (typeof module !== "undefined" && module.exports) {
+    module.exports = VanillaModal;
+  } else {
+    window.VanillaModal = VanillaModal;
+  }
+})();
