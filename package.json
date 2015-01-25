@@ -8,7 +8,10 @@
     "url": "https://github.com/thephuse/vanilla-modal.git"
   },
   "keywords": [
-    "modal"
+    "modal",
+    "ecmascript",
+    "harmony",
+    "es6"
   ],
   "author": "Ben Ceglowski <bceglowski@gmail.com>",
   "license": "MIT",
