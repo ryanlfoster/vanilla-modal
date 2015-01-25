@@ -70,7 +70,7 @@ body > * {
   display: none;
 }
 
-[data-gets-modal] .modal {
+.vanilla-modal .modal {
   display: block;
   position: fixed;
   content: "";
@@ -90,14 +90,14 @@ body > * {
   -webkit-overflow-scrolling: touch;
 }
 
-[data-gets-modal] .modal > * {
+.vanilla-modal .modal > * {
   display: inline-block;
   white-space: normal;
   vertical-align: middle;
   text-align: left;
 }
 
-[data-gets-modal] .modal:before {
+.vanilla-modal .modal:before {
   display: inline-block;
   overflow: hidden;
   width: 0;
@@ -106,7 +106,7 @@ body > * {
   content: "";
 }
 
-[data-gets-modal].modal-visible .modal {
+.vanilla-modal.modal-visible .modal {
   z-index: 99;
   opacity: 1;
   transition: opacity 0.2s;
