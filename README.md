@@ -8,7 +8,7 @@
 
 ### A flexible, dependency-free, CSS-powered JavaScript modal.
 
-Or is it a JavaScript-powered CSS modal? No matter...
+Written in clean ECMAScript 6 and transpiled using 6to5.
 
 ## License
 
@@ -228,7 +228,7 @@ These can be used to programmatically open and close the modal - even from withi
 ---
 #### 6. Programmatically flashing a message on screen
 
-If you need to flash a modal on screen for any reason, it can be done by passing a DOM element or DOM selector string to the `VanillaModal({ href : el })` (where `el` is the selector) constructor or the `open()` function.
+If you need to flash a modal on screen for any reason, it can be done by passing a DOM selector stringto the the `open()` function.
 
 For example:
 
@@ -295,9 +295,13 @@ The selector to bind the `open()` event to. This can be anything. I'd recommend 
 
 As above, except replace `open()` with `close()`, turn around three times, and pat yourself on the head.
 
-#### `parent` : `{string}`
+#### `page` : `{string}`
 
-The outermost object to apply the `[data-gets-modal]` attribute and the `class` class to. This is `body` by default but could just as easily be `html` or `main` in any common web app.
+A single outermost DOM selector to apply the `loadClass` and `class` classes to. This is `body` by default but could just as easily be `html` or `main` in any common web app.
+
+#### `loadClass` : `{string}`
+
+The class to apply to the `page` DOM node at the moment the script loads.
 
 #### `class` : `{string}`
 
@@ -310,6 +314,10 @@ The content container's ID to load into the modal object on instantiation. Use t
 #### `clickOutside` : `{boolean}`
 
 If set to `true`, a click outside the modal will fire a `close()` event. Otherwise, the only ways to close the modal are to hit `[esc]` or click an item covered by the `close` query selector (default: `[rel="modal:close"]`).
+
+#### `escapeKey` : `{boolean}`
+
+If set to `true`, hitting [esc] while the modal is open will fire a `close()` event.
 
 #### `transitions` : `{boolean}`
 

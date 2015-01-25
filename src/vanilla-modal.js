@@ -42,8 +42,6 @@ class VanillaModal {
     
     this._addLoadedCssClass();
     this._addEvents();
-    
-    return this;
   }
   
   applyUserSettings() {
@@ -144,11 +142,10 @@ class VanillaModal {
   
   _getElementContext(e) {
     if (e.currentTarget && typeof e.currentTarget.hash === 'string') {
-      return document.querySelector(e.currentTarget.hash)
+      return document.querySelector(e.currentTarget.hash);
     } else if (typeof e === 'string') {
       return document.querySelector(e);
     }
-    return;
   }
   
   /**
@@ -164,7 +161,6 @@ class VanillaModal {
     this.isOpen = true;
     if (typeof this.$$.onOpen === 'function') this.$$.onOpen.bind(this);
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    return this;
   }
   
   /**
@@ -179,7 +175,6 @@ class VanillaModal {
       this._closeModal();
     }
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    return this;
   }
   
   _closeModal() {

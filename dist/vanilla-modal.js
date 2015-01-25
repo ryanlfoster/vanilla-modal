@@ -47,8 +47,6 @@ var VanillaModal = (function () {
 
     this._addLoadedCssClass();
     this._addEvents();
-
-    return this;
   }
 
   _prototypeProperties(VanillaModal, null, {
@@ -199,7 +197,6 @@ var VanillaModal = (function () {
         } else if (typeof e === "string") {
           return document.querySelector(e);
         }
-        return;
       },
       writable: true,
       enumerable: true,
@@ -220,7 +217,6 @@ var VanillaModal = (function () {
         this.isOpen = true;
         if (typeof this.$$.onOpen === "function") this.$$.onOpen.bind(this);
         if (e && typeof e.preventDefault === "function") e.preventDefault();
-        return this;
       },
       writable: true,
       enumerable: true,
@@ -240,7 +236,6 @@ var VanillaModal = (function () {
           this._closeModal();
         }
         if (e && typeof e.preventDefault === "function") e.preventDefault();
-        return this;
       },
       writable: true,
       enumerable: true,
