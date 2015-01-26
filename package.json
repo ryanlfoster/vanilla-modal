@@ -1,8 +1,8 @@
 {
   "name": "vanilla-modal",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A dependency-free CSS-driven plain JavaScript modal written in ECMAScript 6.",
-  "main": "src/vanilla-modal.js",
+  "main": "dist/vanilla-modal.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/thephuse/vanilla-modal.git"
