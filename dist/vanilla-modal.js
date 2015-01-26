@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 0.3.0
+ * @version 0.3.1
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -54,7 +54,9 @@ var VanillaModal = (function () {
       value: function applyUserSettings() {
         if (typeof this.userSettings === "object") {
           for (var i in this.userSettings) {
-            this.$$[i] = this.userSettings[i];
+            if (userSettings.hasOwnProperty(i)) {
+              this.$$[i] = this.userSettings[i];
+            }
           }
         }
       },
@@ -74,7 +76,8 @@ var VanillaModal = (function () {
         };
         for (var i in transitions) {
           if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
-            return this.transitionEnd = transitions[i];
+            this.transitionEnd = transitions[i];
+            return;
           }
         }
       },
@@ -89,8 +92,8 @@ var VanillaModal = (function () {
        * @param {Node} parent
        */
       value: function getNode(selector, parent) {
-        var parent = parent || document;
-        var node = parent.querySelector(selector);
+        var targetNode = parent || document;
+        var node = targetNode.querySelector(selector);
         if (!node) return console.error("Element \"" + selector + "\" does not exist in context.");
         return node;
       },
@@ -105,8 +108,8 @@ var VanillaModal = (function () {
        * @param {Node} parent
        */
       value: function GetNodeList(selector, parent) {
-        var parent = parent || document;
-        var nodes = parent.querySelectorAll(selector);
+        var targetNode = parent || document;
+        var nodes = targetNode.querySelectorAll(selector);
         if (!nodes.length) return console.error("Element \"" + selector + "\" does not exist in context.");
         return nodes;
       },
@@ -211,7 +214,7 @@ var VanillaModal = (function () {
         this.$$.href = this._getElementContext(e);
         if (this.$$.href instanceof HTMLElement === false) return console.error("Element \"" + this.$$.href + "\" does not exist in context.");
         if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.bind(this);
-        this.captureNode();
+        this._captureNode();
         this._addClass(this.$.page, this.$$["class"]);
         this._setOpenId();
         this.isOpen = true;
@@ -244,7 +247,7 @@ var VanillaModal = (function () {
     _closeModal: {
       value: function CloseModal() {
         this._removeOpenId(this.$.page);
-        this.releaseNode();
+        this._releaseNode();
         this.isOpen = false;
         if (typeof this.$$.onClose === "function") this.$$.onClose.bind(this);
       },
@@ -269,12 +272,8 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    captureNode: {
-
-      /**
-       * @param {Node} node
-       */
-      value: function captureNode(node) {
+    _captureNode: {
+      value: function CaptureNode() {
         try {
           while (this.$$.href.childNodes.length > 0) {
             this.$.modalContent.appendChild(this.$$.href.childNodes[0]);
@@ -287,8 +286,8 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    releaseNode: {
-      value: function releaseNode() {
+    _releaseNode: {
+      value: function ReleaseNode() {
         try {
           while (this.$.modalContent.childNodes.length > 0) {
             this.$$.href.appendChild(this.$.modalContent.childNodes[0]);

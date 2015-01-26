@@ -1,6 +1,6 @@
 /**
  * @class VanillaModal
- * @version 0.3.0
+ * @version 0.3.1
  * @author Ben Ceglowski
  */
 class VanillaModal {
@@ -42,12 +42,15 @@ class VanillaModal {
     
     this._addLoadedCssClass();
     this._addEvents();
+    
   }
   
   applyUserSettings() {
     if (typeof this.userSettings === 'object') {
       for (var i in this.userSettings) {
-        this.$$[i] = this.userSettings[i];
+        if (userSettings.hasOwnProperty(i)) {
+          this.$$[i] = this.userSettings[i];
+        }
       }
     }
   }
@@ -63,7 +66,8 @@ class VanillaModal {
     };
     for (var i in transitions) {
       if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
-        return this.transitionEnd = transitions[i];
+        this.transitionEnd = transitions[i];
+        return;
       }
     }
   }
@@ -73,8 +77,8 @@ class VanillaModal {
    * @param {Node} parent
    */
   getNode(selector, parent) {
-    var parent = parent || document;
-    var node = parent.querySelector(selector);
+    var targetNode = parent || document;
+    var node = targetNode.querySelector(selector);
     if (!node) return console.error('Element "' + selector + '" does not exist in context.');
     return node;
   }
@@ -84,8 +88,8 @@ class VanillaModal {
    * @param {Node} parent
    */
   _getNodeList(selector, parent) {
-    var parent = parent || document;
-    var nodes = parent.querySelectorAll(selector);
+    var targetNode = parent || document;
+    var nodes = targetNode.querySelectorAll(selector);
     if (!nodes.length) return console.error('Element "' + selector + '" does not exist in context.');
     return nodes;
   }
@@ -155,7 +159,7 @@ class VanillaModal {
     this.$$.href = this._getElementContext(e);
     if (this.$$.href instanceof HTMLElement === false) return console.error('Element "' + this.$$.href + '" does not exist in context.');
     if (typeof this.$$.onBeforeOpen === 'function') this.$$.onBeforeOpen.bind(this);
-    this.captureNode();
+    this._captureNode();
     this._addClass(this.$.page, this.$$.class);
     this._setOpenId();
     this.isOpen = true;
@@ -179,7 +183,7 @@ class VanillaModal {
   
   _closeModal() {
     this._removeOpenId(this.$.page);
-    this.releaseNode();
+    this._releaseNode();
     this.isOpen = false;
     if (typeof this.$$.onClose === 'function') this.$$.onClose.bind(this);
   }
@@ -193,10 +197,7 @@ class VanillaModal {
     this.$.modal.addEventListener(this.transitionEnd, this._closeTransitionHandler);
   }
   
-  /**
-   * @param {Node} node
-   */
-  captureNode(node) {
+  _captureNode() {
     try {
       while(this.$$.href.childNodes.length > 0) {
         this.$.modalContent.appendChild(this.$$.href.childNodes[0]);
@@ -206,7 +207,7 @@ class VanillaModal {
     }
   }
   
-  releaseNode() {
+  _releaseNode() {
     try {
       while(this.$.modalContent.childNodes.length > 0) {
         this.$$.href.appendChild(this.$.modalContent.childNodes[0]);
