@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 0.3.2
+ * @version 0.3.3
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -38,11 +38,13 @@ var VanillaModal = (function () {
 
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
+
     this.escapeKeyHandler = this._escapeKeyHandler.bind(this);
     this.outsideClickHandler = this._outsideClickHandler.bind(this);
+    this.closeTransitionHandler = this._closeTransitionHandler.bind(this);
 
-    this.userSettings = this.applyUserSettings(userSettings);
-    this.transitionEnd = this.transitionEndVendorSniff();
+    this.userSettings = this._applyUserSettings(userSettings);
+    this.transitionEnd = this._transitionEndVendorSniff();
     this.$ = this._setupDomNodes();
 
     this._addLoadedCssClass();
@@ -50,8 +52,8 @@ var VanillaModal = (function () {
   }
 
   _prototypeProperties(VanillaModal, null, {
-    applyUserSettings: {
-      value: function applyUserSettings() {
+    _applyUserSettings: {
+      value: function ApplyUserSettings() {
         if (typeof this.userSettings === "object") {
           for (var i in this.userSettings) {
             if (userSettings.hasOwnProperty(i)) {
@@ -64,9 +66,9 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    transitionEndVendorSniff: {
-      value: function transitionEndVendorSniff() {
-        if (this.$$.transitions) return;
+    _transitionEndVendorSniff: {
+      value: function TransitionEndVendorSniff() {
+        if (this.$$.transitions === false) return;
         var el = document.createElement("div");
         var transitions = {
           transition: "transitionend",
@@ -76,8 +78,7 @@ var VanillaModal = (function () {
         };
         for (var i in transitions) {
           if (transitions.hasOwnProperty(i) && el.style[i] !== undefined) {
-            this.transitionEnd = transitions[i];
-            return;
+            return transitions[i];
           }
         }
       },
@@ -85,13 +86,13 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    getNode: {
+    _getNode: {
 
       /**
        * @param {String} selector
        * @param {Node} parent
        */
-      value: function getNode(selector, parent) {
+      value: function GetNode(selector, parent) {
         var targetNode = parent || document;
         var node = targetNode.querySelector(selector);
         if (!node) return console.error("Element \"" + selector + "\" does not exist in context.");
@@ -120,10 +121,10 @@ var VanillaModal = (function () {
     _setupDomNodes: {
       value: function SetupDomNodes() {
         var $ = {};
-        $.modal = this.getNode(this.$$.modal);
-        $.page = this.getNode(this.$$.page);
-        $.modalInner = this.getNode(this.$$.modalInner, this.modal);
-        $.modalContent = this.getNode(this.$$.modalContent, this.modal);
+        $.modal = this._getNode(this.$$.modal);
+        $.page = this._getNode(this.$$.page);
+        $.modalInner = this._getNode(this.$$.modalInner, this.modal);
+        $.modalContent = this._getNode(this.$$.modalContent, this.modal);
         $.open = this._getNodeList(this.$$.open);
         $.close = this._getNodeList(this.$$.close);
         return $;
@@ -257,7 +258,7 @@ var VanillaModal = (function () {
     },
     _closeTransitionHandler: {
       value: function CloseTransitionHandler() {
-        this.$.modal.removeEventListener(this.transitionEnd, this._closeTransitionHandler);
+        this.$.modal.removeEventListener(this.transitionEnd, this.closeTransitionHandler);
         this._closeModal();
       },
       writable: true,
@@ -266,7 +267,7 @@ var VanillaModal = (function () {
     },
     _closeModalWithTransition: {
       value: function CloseModalWithTransition() {
-        this.$.modal.addEventListener(this.transitionEnd, this._closeTransitionHandler);
+        this.$.modal.addEventListener(this.transitionEnd, this.closeTransitionHandler);
       },
       writable: true,
       enumerable: true,
