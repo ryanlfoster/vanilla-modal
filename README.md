@@ -251,6 +251,24 @@ document.addEventListener('DOMContentLoaded', function() {
 ...although this is generally used only for pure evil and should be avoided.
 
 ---
+## Public Properties
+
+* `{Object} $`
+  The DOM nodes used for the modal.
+* `{Object} $$`
+  The modal's settings object.
+* `{Boolean} isOpen`
+  Returns true if the modal is open.
+* `{Node} current`
+  The DOM node currently displayed in the modal. Returns `null` if not set.
+* `{Function} close()`
+  The modal's callable `close` method.
+* `{Function} open(String)`
+  The modal's callable `open` method. Requires an existing DOM selector string.
+* `{Function} destroy()`
+  Closes the modal and removes all event listeners.
+
+---
 ## Options and Defaults
 
 The options object contains DOM selector strings and bindings. It can be overridden at instantiation by providing an `options` object to `new VanillaModal(options)`.
@@ -275,69 +293,65 @@ The options object contains DOM selector strings and bindings. It can be overrid
 }
 ```
 
-#### `modal` : `{string}`
+* `{String} modal`
 
-The class of the outer modal container. This is usually a fixed position element that takes up the whole screen. It doesn't have to be, though - the modal can just as easily be a discreet bar that pops out from the corner of the screen.
+  The class of the outer modal container. This is usually a fixed position element that takes up the whole screen. It doesn't have to be, though - the modal can just as easily be a discreet bar that pops out from the corner of the screen.
 
-#### `modalInner` : `{string}`
+* `{String} modalInner`
 
-The inner container of the modal. This usually houses at least a close button (see HTML above). It should also contain the `modalContent` element.
+  The inner container of the modal. This usually houses at least a close button (see HTML above). It should also contain the `modalContent` element.
 
-#### `modalContent` : `{string}`
+* `{String} modalContent`
 
-The container used to house the modal's content when it's transferred to the modal. This should always be a child of `modalInner`.
+  The container used to house the modal's content when it's transferred to the modal. This should always be a child of `modalInner`.
 
-#### `open` : `{string}`
+* `{String} open`
 
-The selector to bind the `open()` event to. This can be anything. I'd recommend using the default as it makes code legible.
+  The selector to bind the `open()` event to. This can be anything. I'd recommend using the default as it's generic and keeps code legible.
 
-#### `close` : `{string}`
+* `{String} close`
 
-As above, except replace `open()` with `close()`, turn around three times, and pat yourself on the head.
+  As above, except replace `open()` with `close()`, turn around three times, and pat yourself on the head.
 
-#### `page` : `{string}`
+* `{String} page`
 
-A single outermost DOM selector to apply the `loadClass` and `class` classes to. This is `body` by default but could just as easily be `html` or `main` in any common web app.
+  A single outermost DOM selector to apply the `loadClass` and `class` classes to. This is `body` by default but could just as easily be `html` or `main` in any common web app.
 
-#### `loadClass` : `{string}`
+* `{String} loadClass`
 
-The class to apply to the `page` DOM node at the moment the script loads.
+  The class to apply to the `page` DOM node at the moment the script loads.
 
-#### `class` : `{string}`
+* `{String} class`
 
-The class to apply to the `parent` container when the modal is open.
+  The class to apply to the `parent` container when the modal is open.
 
-#### `href` : `{string|node}`
+* `{Boolean} clickOutside`
 
-The content container's ID to load into the modal object on instantiation. Use this when the modal has to be instantiated with an item already loaded up for viewing. This is analogous to the `href` argument supplied to `modal.open(href)`. Always remember that the modal will inline the `innerHTML` of any ID specified.
+  If set to `true`, a click outside the modal will fire a `close()` event. Otherwise, the only ways to close the modal are to hit `[esc]` or click an item covered by the `close` query selector (default: `[rel="modal:close"]`).
 
-#### `clickOutside` : `{boolean}`
+* `{Boolean|Number} closeKey`
 
-If set to `true`, a click outside the modal will fire a `close()` event. Otherwise, the only ways to close the modal are to hit `[esc]` or click an item covered by the `close` query selector (default: `[rel="modal:close"]`).
+  If set to a keycode, hitting that keycode while the modal is open will fire a `close()` event. Set to `false` to disable.
 
-#### `escapeKey` : `{boolean}`
+* `{Boolean} transitions`
 
-If set to `true`, hitting [esc] while the modal is open will fire a `close()` event.
+  If set to `false`, the modal will treat every browser like IE 9 and ignore transitions when opening and closing.
 
-#### `transitions` : `{boolean}`
+* `{Function} onBeforeOpen`
 
-If set to `false`, the modal will treat every browser like IE 9 and ignore transitions when opening and closing.
+  A function hook to fire before opening. This function is bound to the modal instance.
 
-#### `onBeforeOpen` : `{function}`
+* `{Function} onBeforeClose`
 
-A callback hook to fire before opening. This function is bound to the modal.
+  A function hook to fire before closing. This function is bound to the modal instance.
 
-#### `onBeforeClose` : `{function}`
+* `{Function} onOpen`
 
-A callback hook to fire before closing. This function is bound to the modal.
+  A function hook to fire on opening. This function is bound to the modal instance.
 
-#### `onOpen` : `{function}`
+* `{Function} onClose`
 
-A callback hook to fire on opening. This function is bound to the modal.
-
-#### `onClose` : `{function}`
-
-A callback hook to fire on closing. This function is bound to the modal. I just cheated & copy-pasted the last few lines.
+  A function hook to fire on closing. This function is bound to the modal instance. I just cheated & copy-pasted the last few lines.
 
 ---
 ## Compatibility
