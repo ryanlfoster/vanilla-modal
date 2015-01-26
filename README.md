@@ -254,18 +254,31 @@ document.addEventListener('DOMContentLoaded', function() {
 ## Public Properties
 
 * `{Object} $`
+
   The DOM nodes used for the modal.
+
 * `{Object} $$`
+
   The modal's settings object.
+
 * `{Boolean} isOpen`
+
   Returns true if the modal is open.
+
 * `{Node} current`
+
   The DOM node currently displayed in the modal. Returns `null` if not set.
+
 * `{Function} close()`
+
   The modal's callable `close` method.
+
 * `{Function} open(String)`
+
   The modal's callable `open` method. Requires an existing DOM selector string.
+
 * `{Function} destroy()`
+
   Closes the modal and removes all event listeners.
 
 ---
