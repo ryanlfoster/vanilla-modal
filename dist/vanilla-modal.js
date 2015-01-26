@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 0.3.3
+ * @version 0.3.4
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -28,36 +28,39 @@ var VanillaModal = (function () {
       clickOutside: true,
       escapeKey: true,
       transitions: true,
+      transitionEnd: null,
       onBeforeOpen: function () {},
       onBeforeClose: function () {},
       onOpen: function () {},
       onClose: function () {}
     };
 
+    this._applyUserSettings(userSettings);
+
     this.isOpen = false;
 
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
 
-    this.escapeKeyHandler = this._escapeKeyHandler.bind(this);
-    this.outsideClickHandler = this._outsideClickHandler.bind(this);
-    this.closeTransitionHandler = this._closeTransitionHandler.bind(this);
-
-    this.userSettings = this._applyUserSettings(userSettings);
-    this.transitionEnd = this._transitionEndVendorSniff();
     this.$ = this._setupDomNodes();
+    this.$$.transitionEnd = this._transitionEndVendorSniff();
+    this.destroy = this._events().remove;
 
     this._addLoadedCssClass();
-    this._addEvents();
+    this._events().add();
   }
 
   _prototypeProperties(VanillaModal, null, {
     _applyUserSettings: {
-      value: function ApplyUserSettings() {
-        if (typeof this.userSettings === "object") {
-          for (var i in this.userSettings) {
+
+      /**
+       * @param {Object} userSettings
+       */
+      value: function ApplyUserSettings(userSettings) {
+        if (typeof userSettings === "object") {
+          for (var i in userSettings) {
             if (userSettings.hasOwnProperty(i)) {
-              this.$$[i] = this.userSettings[i];
+              this.$$[i] = userSettings[i];
             }
           }
         }
@@ -195,11 +198,17 @@ var VanillaModal = (function () {
       configurable: true
     },
     _getElementContext: {
+
+      /**
+       * @param {mixed} e
+       */
       value: function GetElementContext(e) {
-        if (e.currentTarget && typeof e.currentTarget.hash === "string") {
+        if (e && e.currentTarget && typeof e.currentTarget.hash === "string") {
           return document.querySelector(e.currentTarget.hash);
         } else if (typeof e === "string") {
           return document.querySelector(e);
+        } else {
+          return console.error("No selector supplied to open()");
         }
       },
       writable: true,
@@ -234,7 +243,7 @@ var VanillaModal = (function () {
       value: function Close(e) {
         if (typeof this.$$.onBeforeClose === "function") this.$$.onBeforeClose.bind(this);
         this._removeClass(this.$.page, this.$$["class"]);
-        if (this.$$.transitions && this.transitionEnd) {
+        if (this.$$.transitions && this.$$.transitionEnd) {
           this._closeModalWithTransition();
         } else {
           this._closeModal();
@@ -256,18 +265,13 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    _closeTransitionHandler: {
-      value: function CloseTransitionHandler() {
-        this.$.modal.removeEventListener(this.transitionEnd, this.closeTransitionHandler);
-        this._closeModal();
-      },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
     _closeModalWithTransition: {
       value: function CloseModalWithTransition() {
-        this.$.modal.addEventListener(this.transitionEnd, this.closeTransitionHandler);
+        var _closeTransitionHandler = (function () {
+          this.$.modal.removeEventListener(this.$$.transitionEnd, _closeTransitionHandler);
+          this._closeModal();
+        }).bind(this);
+        this.$.modal.addEventListener(this.$$.transitionEnd, _closeTransitionHandler);
       },
       writable: true,
       enumerable: true,
@@ -295,6 +299,40 @@ var VanillaModal = (function () {
           }
         } catch (e) {
           return console.error("The modal's original container no longer exists.");
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _addEvent: {
+
+      /**
+       * @param {NodeList} nodes
+       * @param {String} event
+       * @param {Function} fn
+       */
+      value: function AddEvent(nodes, event, fn) {
+        if (!nodes.length) nodes = [nodes];
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].addEventListener(event, fn);
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    _removeEvent: {
+
+      /**
+       * @param {NodeList} nodes
+       * @param {String} event
+       * @param {Function} fn
+       */
+      value: function RemoveEvent(nodes, event, fn) {
+        if (!nodes.length) nodes = [nodes];
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].removeEventListener(event, fn);
         }
       },
       writable: true,
@@ -333,57 +371,30 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
-    _addEvent: {
+    _events: {
+      value: function Events() {
+        var _escapeKeyHandler = this._escapeKeyHandler.bind(this);
+        var _outsideClickHandler = this._outsideClickHandler.bind(this);
 
-      /**
-       * @param {NodeList} nodes
-       * @param {String} event
-       * @param {Function} fn
-       */
-      value: function AddEvent(nodes, event, fn) {
-        if (!nodes.length) nodes = [nodes];
-        for (var i = 0; i < nodes.length; i++) {
-          nodes[i].addEventListener(event, fn);
-        }
-      },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
-    _removeEvent: {
+        var add = function () {
+          this._addEvent(this.$.open, "click", this.open);
+          this._addEvent(this.$.close, "click", this.close);
+          if (this.$$.escapeKey === true) this._addEvent(document, "keydown", _escapeKeyHandler);
+          if (this.$$.clickOutside === true) this._addEvent(this.$.modal, "click", _outsideClickHandler);
+        };
 
-      /**
-       * @param {NodeList} nodes
-       * @param {String} event
-       * @param {Function} fn
-       */
-      value: function RemoveEvent(nodes, event, fn) {
-        for (var i = 0; i < nodes.length; i++) {
-          nodes[i].removeEventListener(event, fn);
-        }
-      },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
-    _addEvents: {
-      value: function AddEvents() {
-        this._addEvent(this.$.open, "click", this.open);
-        this._addEvent(this.$.close, "click", this.close);
-        if (this.$$.escapeKey === true) this._addEvent(document, "keydown", this.escapeKeyHandler);
-        if (this.$$.clickOutside === true) this._addEvent(this.$.modal, "click", this.outsideClickHandler);
-      },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
-    destroy: {
-      value: function destroy() {
-        this.close();
-        this._removeEvent(this.$.open, "click", this.open);
-        this._removeEvent(this.$.close, "click", this.close);
-        if (this.$$.escapeKey === true) this._removeEvent(document, "keydown", this.escapeKeyHandler);
-        if (this.$$.clickOutside === true) this._removeEvent(this.$.modal, "click", this.outsideClickHandler);
+        var remove = function () {
+          this.close();
+          this._removeEvent(this.$.open, "click", this.open);
+          this._removeEvent(this.$.close, "click", this.close);
+          if (this.$$.escapeKey === true) this._removeEvent(document, "keydown", _escapeKeyHandler);
+          if (this.$$.clickOutside === true) this._removeEvent(this.$.modal, "click", _outsideClickHandler);
+        };
+
+        return {
+          add: add.bind(this),
+          remove: remove.bind(this)
+        };
       },
       writable: true,
       enumerable: true,
