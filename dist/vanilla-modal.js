@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 0.4.0
+ * @version 0.4.1
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
