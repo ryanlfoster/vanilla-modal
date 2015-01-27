@@ -30,6 +30,10 @@ Because of the bloat of DOM libraries. Because of the dreadful performance of mo
 
 Great though [CSS Modal](http://drublic.github.io/css-modal/) (and similar solutions) are, developers may encounter problems when building a stateful UI, as using the CSS `:target` pseudo-class invariably means changing the window's `location.hash` property. This can cause havoc with client-side routers, as well as obfuscate the modal on the offchance that any anchor inside it changes the window's hash.
 
+### My app is built using JavaScript framework `foo`
+
+Not to worry. `open` and `close` event listeners are delegated so the modal script will keep running irrespective of whether you're using a client-side router. If you're desperate for garbage collection (e.g. if your app's made from last week's haddock surprise), you might be pleased to know there's a `destroy` method baked into the modal too.
+
 ### Usage and Examples
 ---
 

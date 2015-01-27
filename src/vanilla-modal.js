@@ -1,6 +1,6 @@
 /**
  * @class VanillaModal
- * @version 0.3.5
+ * @version 0.4.0
  * @author Ben Ceglowski
  */
 class VanillaModal {
@@ -30,17 +30,12 @@ class VanillaModal {
     };
     
     this._applyUserSettings(userSettings);
-    
     this.isOpen = false;
     this.current = null;
-    
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
-     
     this.$ = this._setupDomNodes();
     this.$$.transitionEnd = this._transitionEndVendorSniff();
-    this.destroy = this._events().remove;
-    
     this._addLoadedCssClass();
     this._events().add();
     
@@ -103,8 +98,6 @@ class VanillaModal {
     $.page = this._getNode(this.$$.page);
     $.modalInner = this._getNode(this.$$.modalInner, this.modal);
     $.modalContent = this._getNode(this.$$.modalContent, this.modal);
-    $.open = this._getNodeList(this.$$.open);
-    $.close = this._getNodeList(this.$$.close);
     return $;
   }
   
@@ -151,8 +144,8 @@ class VanillaModal {
    * @param {mixed} e
    */
   _getElementContext(e) {
-    if (e && e.currentTarget && typeof e.currentTarget.hash === 'string') {
-      return document.querySelector(e.currentTarget.hash);
+    if (e && typeof e.hash === 'string') {
+      return document.querySelector(e.hash);
     } else if (typeof e === 'string') {
       return document.querySelector(e);
     } else {
@@ -165,14 +158,13 @@ class VanillaModal {
    */
   _open(e) {
     this.current = this._getElementContext(e);
-    if (this.current instanceof HTMLElement === false) return console.error('Element "' + this.current + '" does not exist in context.');
+    if (this.current instanceof HTMLElement === false) return console.error('VanillaModal target must exist on page.');
     if (typeof this.$$.onBeforeOpen === 'function') this.$$.onBeforeOpen.bind(this);
     this._captureNode();
     this._addClass(this.$.page, this.$$.class);
     this._setOpenId();
     this.isOpen = true;
     if (typeof this.$$.onOpen === 'function') this.$$.onOpen.bind(this);
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
   }
   
   /**
@@ -186,7 +178,6 @@ class VanillaModal {
     } else {
       this._closeModal();
     }
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
   }
   
   _closeModal() {
@@ -206,46 +197,14 @@ class VanillaModal {
   }
   
   _captureNode() {
-    try {
-      while(this.current.childNodes.length > 0) {
-        this.$.modalContent.appendChild(this.current.childNodes[0]);
-      }
-    } catch(e) {
-      return console.error('The target modal has no child elements.');
+    while (this.current.childNodes.length > 0) {
+      this.$.modalContent.appendChild(this.current.childNodes[0]);
     }
   }
   
   _releaseNode() {
-    try {
-      while(this.$.modalContent.childNodes.length > 0) {
-        this.current.appendChild(this.$.modalContent.childNodes[0]);
-      }
-    } catch(e) {
-      return console.error('The modal\'s original container no longer exists.');
-    }
-  }
-  
-  /**
-   * @param {NodeList} nodes
-   * @param {String} event
-   * @param {Function} fn
-   */
-  _addEvent(nodes, event, fn) {
-    if (! nodes.length) nodes = [nodes];
-    for (let i = 0; i < nodes.length; i++) {
-      nodes[i].addEventListener(event, fn);
-    }
-  }
-  
-  /**
-   * @param {NodeList} nodes
-   * @param {String} event
-   * @param {Function} fn
-   */
-  _removeEvent(nodes, event, fn) {
-    if (! nodes.length) nodes = [nodes];
-    for (let i = 0; i < nodes.length; i++) {
-      nodes[i].removeEventListener(event, fn);
+    while (this.$.modalContent.childNodes.length > 0) {
+      this.current.appendChild(this.$.modalContent.childNodes[0]);
     }
   }
   
@@ -253,6 +212,7 @@ class VanillaModal {
    * @param {Event} e
    */
   _closeKeyHandler(e) {
+    if (typeof this.$$.closeKey !== 'number') return;
     if (e.which === this.$$.closeKey && this.isOpen === true) {
       e.preventDefault();
       this.close();
@@ -263,6 +223,7 @@ class VanillaModal {
    * @param {Event} e
    */
   _outsideClickHandler(e) {
+    if (this.$$.clickOutside !== true) return;
     var node = e.target;
     while(node != document.body) {
       if (node === this.$.modalInner) return;
@@ -271,29 +232,71 @@ class VanillaModal {
     this.close();
   }
   
+  /**
+   * @param {Event} e
+   * @param {String} selector
+   */
+  _matches(e, selector) {
+    var el = e.target;
+    var matches = (el.document || el.ownerDocument).querySelectorAll(selector);
+    for (let i = 0; i < matches.length; i++) {
+      let child = el;
+      while (child !== document.body) {
+        if (child === matches[i]) return child;
+        child = child.parentNode;
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _delegateOpen(e) {
+    e.preventDefault();
+    var matches = this._matches(e, this.$$.open);
+    if (matches) {
+      return this.open(matches);
+    }
+  }
+  
+  /**
+   * @param {Event} e
+   */
+  _delegateClose(e) {
+    e.preventDefault();
+    if (this._matches(e, this.$$.close)) {
+      return this.close();
+    }
+  }
+  
+  /**
+   * @private {Function} add
+   */
   _events() {
     
-    var _closeKeyHandler = this._closeKeyHandler.bind(this);
-    var _outsideClickHandler = this._outsideClickHandler.bind(this);
+    let _closeKeyHandler = this._closeKeyHandler.bind(this);
+    let _outsideClickHandler = this._outsideClickHandler.bind(this);
+    let _delegateOpen = this._delegateOpen.bind(this);
+    let _delegateClose = this._delegateClose.bind(this);
     
     var add = function() {
-      this._addEvent(this.$.open, 'click', this.open);
-      this._addEvent(this.$.close, 'click', this.close);
-      if (typeof this.$$.closeKey === 'number') this._addEvent(document, 'keydown', _closeKeyHandler);
-      if (this.$$.clickOutside === true) this._addEvent(this.$.modal, 'click', _outsideClickHandler);
+      this.$.modal.addEventListener('click', _outsideClickHandler);
+      document.addEventListener('keydown', _closeKeyHandler);
+      document.addEventListener('click', _delegateOpen);
+      document.addEventListener('click', _delegateClose);
     };
   
-    var remove = function() {
+    this.destroy = function() {
       this.close();
-      this._removeEvent(this.$.open, 'click', this.open);
-      this._removeEvent(this.$.close, 'click', this.close);
-      if (typeof this.$$.closeKey === 'number') this._removeEvent(document, 'keydown', _closeKeyHandler);
-      if (this.$$.clickOutside === true) this._removeEvent(this.$.modal, 'click', _outsideClickHandler);
+      this.$.modal.removeEventListener('click', _outsideClickHandler);
+      document.removeEventListener('keydown', _closeKeyHandler);
+      document.removeEventListener('click', _delegateOpen);
+      document.removeEventListener('click', _delegateClose);
     };
     
     return {
-      add : add.bind(this),
-      remove : remove.bind(this)
+      add : add.bind(this)
     };
     
   }
