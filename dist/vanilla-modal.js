@@ -216,12 +216,12 @@ var VanillaModal = (function () {
       value: function Open(e) {
         this.current = this._getElementContext(e);
         if (this.current instanceof HTMLElement === false) return console.error("VanillaModal target must exist on page.");
-        if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.bind(this);
+        if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.call(this);
         this._captureNode();
         this._addClass(this.$.page, this.$$["class"]);
         this._setOpenId();
         this.isOpen = true;
-        if (typeof this.$$.onOpen === "function") this.$$.onOpen.bind(this);
+        if (typeof this.$$.onOpen === "function") this.$$.onOpen.call(this);
       },
       writable: true,
       enumerable: true,
@@ -233,7 +233,7 @@ var VanillaModal = (function () {
        * @param {Event} e
        */
       value: function Close(e) {
-        if (typeof this.$$.onBeforeClose === "function") this.$$.onBeforeClose.bind(this);
+        if (typeof this.$$.onBeforeClose === "function") this.$$.onBeforeClose.call(this);
         this._removeClass(this.$.page, this.$$["class"]);
         if (this.$$.transitions && this.$$.transitionEnd) {
           this._closeModalWithTransition();
@@ -251,7 +251,7 @@ var VanillaModal = (function () {
         this._releaseNode();
         this.isOpen = false;
         this.current = null;
-        if (typeof this.$$.onClose === "function") this.$$.onClose.bind(this);
+        if (typeof this.$$.onClose === "function") this.$$.onClose.call(this);
       },
       writable: true,
       enumerable: true,

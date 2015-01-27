@@ -22,9 +22,7 @@ That's not a question and this is not the script you're looking for. It is licen
 
 ### Why plain JavaScript?
 
-Because of the bloat of DOM libraries. Because of the dreadful performance of monolithic JavaScript frameworks. Because decoupled is the way to go. Because standard JavaScript provides everything you need for this task. Because sometimes, a 5KB minified script is all you need.
-
-<sup><sub>Also because sometimes you're adding this to something ridiculous like 97 gzipped kilobytes of Ember.js.</sub></sup>
+Because of the bloat of DOM libraries. Because of the dreadful performance of monolithic JavaScript frameworks. Because decoupled is the way to go. Because standard JavaScript provides everything you need for this task. Because sometimes, a 7KB minified (1.8KB gzipped) script is all you need. Also because sometimes you're adding this to an already glorious JavaScript overhead, e.g. 97 gzipped kilobytes of Ember.js.
 
 ### What about CSS Modal?
 
@@ -107,6 +105,8 @@ Next, add your modal content to hidden containers on the page. The modal will in
 
 <sup><sub>You nutty professor, you.</sub></sup>
 
+#### [Here's an example stylesheet (written in SCSS)](https://gist.github.com/benceg/245eb1c6d36af35a7cce#file-modal-scss)
+
 Forget choppy UI animations and JavaScript modal display parameters. Vanilla Modal keeps display specifications where they belong: in stylesheets. Hardware acceleration optional, but recommended, as is the liberal use of `vw`, `vh` and `calc` units to win friends and influence people.
 
 The only things to remember here are:
@@ -116,96 +116,12 @@ The only things to remember here are:
 transition: opacity 0.2s, z-index 0s 0.2s;
 ```
 
-Here's an example (in Compass):
-
-```scss
-// Prevents the modal from flashing on-screen.
-.modal {
-  display: none;
-}
-
-// The following directives only apply once the script has loaded.
-[data-gets-modal] {
-  
-  .modal {
-    position: fixed;
-    content: "";
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(#000, 0.6);
-    z-index: -1;
-    opacity: 0;
-    font-size: 0;
-	// Note the delay on the z-index.
-    // Read above if you're wondering
-    // why this is here.
-    transition: opacity 0.2s, z-index 0s 0.2s;
-    text-align: center;
-    overflow: hidden;
-    overflow-y: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    
-    // This little bit of code centers the
-    // modal's inner container vertically.
-    > * {
-      display: inline-block;
-      white-space: normal;
-      vertical-align: middle;
-      text-align: left;
-    }
-    
-    &:before {
-      display: inline-block;
-      overflow: hidden;
-      width: 0;
-      height: 100%;
-      vertical-align: middle;
-      content: "";
-    }
-  }
- 
-  &.modal-visible {
-    .modal {
-      z-index: 99;
-      opacity: 1;
-      // Note that we've removed any transiton on the
-	  // z-index when the modal is in its visible state.
-      transition: opacity 0.2s;
-    }
-  }
-
-}
-
-.modal-inner {
-  position: relative;
-  overflow: hidden;
-  width: 90%;
-  max-height: 90%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  background: #fff;
-  z-index: -1;
-  opacity: 0;
-  transform: scale(0);
-  transition: opacity 0.2s, transform 0.2s, z-index 0s 0.2s;
-  margin: 20px 0;
-  
-  .modal-visible & {
-    z-index: 100;
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 0.2s, transform 0.2s;
-  }
-}
-```
-
 ---
-#### 5. Directives and Methods
+#### 5. Delegates and Methods
 
-Only two HTML directives affect the modal: the self-explanatory `rel="modal:open"` and `rel="modal:close`:
+Only two HTML delegates affect the modal. By default:
+* `[rel="modal:open"]` maps to `modal.open()` and
+* `[rel="modal:close]` maps to `modal.close()`, where `modal` is the VanillaModal instance name.
 
 ```html
 <a href="#modal-1" rel="modal:open">Modal 1</a>
@@ -217,42 +133,32 @@ Only two HTML directives affect the modal: the self-explanatory `rel="modal:open
 ```
 ...will close the modal.
 
-In JavaScript, those directives translate to:
+The defaults can be changed at instantiation:
 
 ```js
-modal.open();
+var modal = new VanillaModal({ open : '.my-open-class', close : '.my-close-class' });
 ```
-and
-```js
-modal.close();
-```
-
-These can be used to programmatically open and close the modal - even from within different frames!
 
 ---
 #### 6. Programmatically flashing a message on screen
 
-If you need to flash a modal on screen for any reason, it can be done by passing a DOM selector stringto the the `open()` function.
+If you need to flash a modal on screen for any reason, it can be done by passing a DOM selector string to the the `open()` function.
 
 For example:
 
 ```js
 var modal = new VanillaModal();
 
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // Flashes a message on the screen,
-  // momentarily, to annoy people.
-  modal.open('#psa');
+// Flashes a message on the screen to annoy people.
+modal.open('#psa');
 
-  setTimeout(function() {
-    modal.close();
-  }, 2000);
-  
-});
+// Closes the modal while they're still looking for the close button.
+setTimeout(function() {
+  modal.close();
+}, 2000);
 ```
 
-...although this is generally used only for pure evil and should be avoided.
+...although this is a truly evil practice and should be avoided on pain of dismemberment.
 
 ---
 ## Public Properties
@@ -291,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
 The options object contains DOM selector strings and bindings. It can be overridden at instantiation by providing an `options` object to `new VanillaModal(options)`.
 
 #### Defaults:
-```javascript
+```js
 {
   modal : '.modal',
   modalInner : '.modal-inner',

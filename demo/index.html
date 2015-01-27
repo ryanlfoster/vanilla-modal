@@ -42,6 +42,19 @@
     </div>
     
     <script src="../dist/vanilla-modal.js"></script>
-    <script>var modal = new VanillaModal();</script>
+    <script>var modal = new VanillaModal({
+      onBeforeOpen : function() {
+        console.log('onBeforeOpen hook');
+      },
+      onOpen : function() {
+        console.log('onOpen hook');
+      },
+      onBeforeClose : function() {
+        console.log('onBeforeClose hook');
+      },
+      onClose : function() {
+        console.log('onClose hook');
+      }
+    });</script>
   </body>
 </html>
