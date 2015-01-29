@@ -196,6 +196,8 @@ setTimeout(function() {
 
 The options object contains DOM selector strings and bindings. It can be overridden at instantiation by providing an `options` object to `new VanillaModal(options)`.
 
+The API is feature-frozen for the `version 1.x.x` branch.
+
 #### Defaults:
 ```js
 {

@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 0.4.1
+ * @version 1.0.0
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -35,14 +35,20 @@ var VanillaModal = (function () {
     };
 
     this._applyUserSettings(userSettings);
+    this.error = false;
     this.isOpen = false;
     this.current = null;
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
-    this.$ = this._setupDomNodes();
     this.$$.transitionEnd = this._transitionEndVendorSniff();
-    this._addLoadedCssClass();
-    this._events().add();
+    this.$ = this._setupDomNodes();
+
+    if (!this.error) {
+      this._addLoadedCssClass();
+      this._events().add();
+    } else {
+      console.error("Please fix errors before proceeding.");
+    }
   }
 
   _prototypeProperties(VanillaModal, null, {
@@ -93,24 +99,11 @@ var VanillaModal = (function () {
       value: function GetNode(selector, parent) {
         var targetNode = parent || document;
         var node = targetNode.querySelector(selector);
-        if (!node) return console.error("Element \"" + selector + "\" does not exist in context.");
+        if (!node) {
+          this.error = true;
+          return console.error(selector + " not found in document.");
+        }
         return node;
-      },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
-    _getNodeList: {
-
-      /**
-       * @param {String} selector
-       * @param {Node} parent
-       */
-      value: function GetNodeList(selector, parent) {
-        var targetNode = parent || document;
-        var nodes = targetNode.querySelectorAll(selector);
-        if (!nodes.length) return console.error("Element \"" + selector + "\" does not exist in context.");
-        return nodes;
       },
       writable: true,
       enumerable: true,
