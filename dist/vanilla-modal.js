@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 1.0.1
+ * @version 1.1.0
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -220,6 +220,21 @@ var VanillaModal = (function () {
       enumerable: true,
       configurable: true
     },
+    _detectTransition: {
+      value: function DetectTransition() {
+        var css = window.getComputedStyle(this.$.modal, null);
+        var transitionDuration = ["transitionDuration", "oTransitionDuration", "MozTransitionDuration", "webkitTransitionDuration"];
+        var hasTransition = transitionDuration.filter(function (i) {
+          if (typeof css[i] === "string" && parseFloat(css[i]) > 0) {
+            return true;
+          }
+        });
+        return hasTransition.length ? true : false;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
     _close: {
 
       /**
@@ -228,7 +243,8 @@ var VanillaModal = (function () {
       value: function Close(e) {
         if (typeof this.$$.onBeforeClose === "function") this.$$.onBeforeClose.call(this);
         this._removeClass(this.$.page, this.$$["class"]);
-        if (this.$$.transitions && this.$$.transitionEnd) {
+        var transitions = this._detectTransition();
+        if (this.$$.transitions && this.$$.transitionEnd && transitions) {
           this._closeModalWithTransition();
         } else {
           this._closeModal();

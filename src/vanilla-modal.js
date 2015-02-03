@@ -1,6 +1,6 @@
 /**
  * @class VanillaModal
- * @version 1.0.1
+ * @version 1.1.0
  * @author Ben Ceglowski
  */
 class VanillaModal {
@@ -165,13 +165,25 @@ class VanillaModal {
     if (typeof this.$$.onOpen === 'function') this.$$.onOpen.call(this);
   }
   
+  _detectTransition() {
+    var css = window.getComputedStyle(this.$.modal, null);
+    var transitionDuration = ['transitionDuration', 'oTransitionDuration', 'MozTransitionDuration', 'webkitTransitionDuration'];
+    var hasTransition = transitionDuration.filter(function(i) {
+      if (typeof css[i] === 'string' && parseFloat(css[i]) > 0) {
+        return true;
+      }
+    });
+    return (hasTransition.length) ? true : false;
+  }
+    
   /**
    * @param {Event} e
    */
   _close(e) {
     if (typeof this.$$.onBeforeClose === 'function') this.$$.onBeforeClose.call(this);
     this._removeClass(this.$.page, this.$$.class);
-    if (this.$$.transitions && this.$$.transitionEnd) {
+    var transitions = this._detectTransition();
+    if (this.$$.transitions && this.$$.transitionEnd && transitions) {
       this._closeModalWithTransition();
     } else {
       this._closeModal();
