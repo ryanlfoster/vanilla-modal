@@ -7,7 +7,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 1.0.0
+ * @version 1.0.1
  * @author Ben Ceglowski
  */
 var VanillaModal = (function () {
@@ -344,9 +344,9 @@ var VanillaModal = (function () {
        * @param {Event} e
        */
       value: function DelegateOpen(e) {
-        e.preventDefault();
         var matches = this._matches(e, this.$$.open);
         if (matches) {
+          e.preventDefault();
           return this.open(matches);
         }
       },
@@ -360,8 +360,8 @@ var VanillaModal = (function () {
        * @param {Event} e
        */
       value: function DelegateClose(e) {
-        e.preventDefault();
         if (this._matches(e, this.$$.close)) {
+          e.preventDefault();
           return this.close();
         }
       },

@@ -1,6 +1,6 @@
 /**
  * @class VanillaModal
- * @version 1.0.0
+ * @version 1.0.1
  * @author Ben Ceglowski
  */
 class VanillaModal {
@@ -251,9 +251,9 @@ class VanillaModal {
    * @param {Event} e
    */
   _delegateOpen(e) {
-    e.preventDefault();
     var matches = this._matches(e, this.$$.open);
     if (matches) {
+      e.preventDefault();
       return this.open(matches);
     }
   }
@@ -262,8 +262,8 @@ class VanillaModal {
    * @param {Event} e
    */
   _delegateClose(e) {
-    e.preventDefault();
     if (this._matches(e, this.$$.close)) {
+      e.preventDefault();
       return this.close();
     }
   }
